@@ -1,6 +1,7 @@
 package com.programming.springredditclone.service;
 
 import com.programming.springredditclone.dto.SubredditRequest;
+import com.programming.springredditclone.exception.SpringRedditException;
 import com.programming.springredditclone.model.Subreddit;
 import com.programming.springredditclone.repository.SubredditRepository;
 import lombok.AllArgsConstructor;
@@ -44,4 +45,9 @@ public class SubredditService {
                 .build();
     }
 
+    public SubredditRequest getSubredditById(Long id) {
+        Subreddit subreddit = subredditRepository.findById(id).orElseThrow(()->
+                new SpringRedditException("Subreddit not found by id: " + id));
+        return mapToSubredditRequest(subreddit);
+    }
 }
