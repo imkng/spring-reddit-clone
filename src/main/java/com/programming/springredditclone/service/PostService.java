@@ -72,6 +72,7 @@ public class PostService {
         return PostResponse.builder()
                 .id(post.getPostId())
                 .url(post.getUrl())
+                .postName(post.getPostName())
                 .description(post.getDescription())
                 .subredditName(post.getSubreddit().getName())
                 .userName(post.getUser().getUserName())
