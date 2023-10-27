@@ -1,5 +1,6 @@
 package com.programming.springredditclone.service;
 
+import com.github.marlonlom.utilities.timeago.TimeAgo;
 import com.programming.springredditclone.dto.PostRequest;
 import com.programming.springredditclone.dto.PostResponse;
 import com.programming.springredditclone.exception.SpringRedditException;
@@ -7,6 +8,7 @@ import com.programming.springredditclone.exception.SpringRedditNotFoundException
 import com.programming.springredditclone.exception.UserNotFoundException;
 import com.programming.springredditclone.model.Post;
 import com.programming.springredditclone.model.Subreddit;
+import com.programming.springredditclone.repository.CommentRepository;
 import com.programming.springredditclone.repository.PostRepository;
 import com.programming.springredditclone.repository.SubredditRepository;
 import com.programming.springredditclone.repository.UserRepository;
@@ -30,6 +32,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     public void savePost(PostRequest postRequest) {
         Subreddit subreddit = (Subreddit) subredditRepository.findByName(postRequest.getSubredditName()).orElseThrow(() ->
@@ -76,7 +79,18 @@ public class PostService {
                 .description(post.getDescription())
                 .subredditName(post.getSubreddit().getName())
                 .userName(post.getUser().getUserName())
+                .commentCount(commentCount(post))
+                .duration(getDurationPost(post))
+                .voteCount(post.getVoteCount())
                 .build();
+    }
+
+    private String getDurationPost(Post post) {
+        return TimeAgo.using(post.getCreatedAt().toEpochMilli());
+    }
+
+    private Integer commentCount(Post post) {
+        return commentRepository.findAllByPost(post).size();
     }
 
     private Post mapToPost(PostRequest postRequest, Subreddit subreddit, com.programming.springredditclone.model.User currentUser) {
@@ -87,6 +101,7 @@ public class PostService {
                 .createdAt(Instant.now())
                 .subreddit(subreddit)
                 .user(currentUser)
+                .voteCount(0)
                 .build();
     }
 }
